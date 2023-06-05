@@ -1,0 +1,7 @@
+refresh_delay: 5
+allow_change_skin: false
+skin_category:
+  "test":
+    "displayName": "233"
+particle_category: {}
+cape_category: {}
