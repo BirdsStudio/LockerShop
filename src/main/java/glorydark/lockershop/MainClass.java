@@ -7,12 +7,11 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
-import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.event.player.PlayerChangeSkinEvent;
+import cn.nukkit.event.player.PlayerLocallyInitializedEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
-import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.form.element.ElementButtonImageData;
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
-import cn.nukkit.network.protocol.PlayerSkinPacket;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
@@ -59,8 +58,10 @@ public class MainClass extends PluginBase{
 
     public static HashMap<Player, String> particlesCache = new HashMap<>();
 
-
     public static Config configs;
+
+    public static boolean allow_change_skin;
+
 
     @Override
     public void onEnable() {
@@ -98,6 +99,7 @@ public class MainClass extends PluginBase{
         defaultSkin = loadSkin("default");
         Config config = new Config(path+"/config.yml", Config.YAML);
         configs = config;
+        allow_change_skin = config.getBoolean("allow_change_skin", false);
         this.getLogger().info("LockerShop Enabled");
         this.getServer().getCommandMap().register("", new Commands("locker"));
         this.getServer().getPluginManager().registerEvents(new EventsListener(), this);
@@ -309,14 +311,6 @@ public class MainClass extends PluginBase{
         }
     }
     public static class EventsListener implements Listener{
-        @EventHandler
-        public void DataPacketReceiveEvent(DataPacketReceiveEvent event){
-            if(event.getPacket() instanceof PlayerSkinPacket){
-                if(!(boolean) MainClass.configs.getBoolean("allow_change_skin", false)) {
-                    event.setCancelled(true);
-                }
-            }
-        }
 
         public void checkPlayer(Player p){
             File file = new File(MainClass.path+"/players/"+p.getName()+".yml");
@@ -331,7 +325,7 @@ public class MainClass extends PluginBase{
                     if (subSection.getLong("due") <= System.currentTimeMillis() && subSection.getLong("due") != 0) {
                         skinItem skinItem = MainClass.skins.get(key);
                         if (skinItem != null) {
-                            skinItem.unequip(p);
+                            skinItem.remove(p);
                             p.sendMessage("§c[提示] 您的皮肤§e" + skinItem.getDisplayName() + "§c已过期！");
                         }
                         config.getSection("skins").remove(key);
@@ -347,7 +341,7 @@ public class MainClass extends PluginBase{
                     if(subSection.getLong("due") <= System.currentTimeMillis() && subSection.getLong("due") != 0L){
                         capeItem skinItem = MainClass.capes.get(key);
                         if(skinItem != null) {
-                            skinItem.unequip(p);
+                            skinItem.remove(p);
                             p.sendMessage("§c[提示] 您的披风§e" + skinItem.getDisplayName()+"§c已过期！");
                         }
                         MainClass.instance.getLogger().warning("capes."+key);
@@ -364,7 +358,7 @@ public class MainClass extends PluginBase{
                     if(subSection.getLong("due") <= System.currentTimeMillis() && subSection.getLong("due") != 0L){
                         capeItem skinItem = MainClass.capes.get(key);
                         if(skinItem != null) {
-                            skinItem.unequip(p);
+                            skinItem.remove(p);
                             p.sendMessage("§c[提示] 您的粒子§e" + skinItem.getDisplayName()+"§c已过期！");
                         }
                         MainClass.instance.getLogger().warning("particles."+key);
@@ -377,7 +371,14 @@ public class MainClass extends PluginBase{
         }
 
         @EventHandler
-        public void Join(PlayerJoinEvent event){
+        public void PlayerChangeSkinEvent(PlayerChangeSkinEvent event){
+            if(!allow_change_skin){
+                event.setCancelled(true);
+            }
+        }
+
+        @EventHandler
+        public void PlayerLocallyInitializedEvent(PlayerLocallyInitializedEvent event){
             Player player = event.getPlayer();
             checkPlayer(player);
             skinItem skinItem = MainClass.skins.getOrDefault(getDisplaySkin(event.getPlayer()), null);
@@ -388,7 +389,7 @@ public class MainClass extends PluginBase{
                         capeItem.equip(player, false);
                     }else{
                         setDisplayCape(player.getName(), "");
-                        event.getPlayer().setSkin(defaultSkin); //处理小概率离谱未清理事件
+                        player.setSkin(defaultSkin); //处理小概率离谱未清理事件
                     }
                 }
                 if (skinItem != null) {
@@ -401,7 +402,9 @@ public class MainClass extends PluginBase{
                 }
                 player.sendMessage("§a已自动为您换上上次装扮的皮肤！");
             }else{
-                player.setSkin(defaultSkin);
+                if(!allow_change_skin) {
+                    player.setSkin(defaultSkin);
+                }
             }
             if(!getDisplayParticle(player).equals("")){
                 particlesCache.put(player, getDisplayParticle(player));

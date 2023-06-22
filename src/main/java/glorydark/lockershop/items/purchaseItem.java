@@ -6,7 +6,7 @@ public interface purchaseItem {
 
     void equip(Player player);
 
-    void unequip(Player player);
+    void remove(Player player);
 
     boolean claim(String player, String claimer, boolean purchase, Object... params);
 

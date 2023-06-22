@@ -18,15 +18,21 @@ public class particleItem implements purchaseItem{
     String name;
 
     String displayName;
+
     String description;
+
     String identifier;
 
     String category;
 
     ElementButtonImageData iconData;
+
     double needMoney;
+
     boolean isAllowToUse; //可使用
+
     boolean isPurchasable; //可购买
+
     long duration;
 
     public particleItem(String name, String displayName, String description, String category, ElementButtonImageData iconData, String identifier, double needMoney, boolean isAllowToUse, boolean isPurchasable, long duration){
@@ -59,7 +65,7 @@ public class particleItem implements purchaseItem{
         }
     }
 
-    public void unequip(Player player){
+    public void remove(Player player){
         //移除
         MainClass.particlesCache.remove(player);
         MainClass.setDisplayParticle(player.getName(), "");

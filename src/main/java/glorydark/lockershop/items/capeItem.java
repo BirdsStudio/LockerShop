@@ -4,30 +4,34 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.form.element.ElementButtonImageData;
+import cn.nukkit.network.protocol.PlayerSkinPacket;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.SerializedImage;
 import glorydark.lockershop.MainClass;
 import lombok.Data;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 public class capeItem implements purchaseItem {
     String name;
 
     String displayName;
+
     String description;
 
     String category;
+
     SerializedImage skin;
 
     ElementButtonImageData iconData;
+
     double needMoney;
+
     boolean isAllowToUse; //可使用
+
     boolean isPurchasable; //可购买
+
     long duration;
 
     public capeItem(String name, String displayName, String description, String category, ElementButtonImageData iconData, SerializedImage skin, double needMoney, boolean isAllowToUse, boolean isPurchasable, long duration){
@@ -60,7 +64,7 @@ public class capeItem implements purchaseItem {
         }
     }
 
-    public void unequip(Player player){
+    public void remove(Player player){
         removeCapeSkin(player);
         MainClass.setDisplayCape(player.getName(), "");
         MainClass.players.put(player, System.currentTimeMillis()+5000);
@@ -143,6 +147,7 @@ public class capeItem implements purchaseItem {
 
     public void setCapeSkin(Player p){
         Skin modelSkin = new Skin();
+        modelSkin.setSkinId(MainClass.defaultSkin.getSkinId());
         modelSkin.setSkinData(p.getSkin().getSkinData());
         modelSkin.setGeometryData(p.getSkin().getGeometryData());
         modelSkin.setGeometryDataEngineVersion(p.getSkin().getGeometryDataEngineVersion());
@@ -153,10 +158,19 @@ public class capeItem implements purchaseItem {
         modelSkin.setCapeOnClassic(true);
         modelSkin.setTrusted(true);
         p.setSkin(modelSkin);
+        PlayerSkinPacket packet = new PlayerSkinPacket();
+        packet.skin = modelSkin;
+        packet.newSkinName = modelSkin.getSkinId();
+        packet.oldSkinName = p.getSkin().getSkinId();
+        packet.uuid = p.getUniqueId();
+        HashSet<Player> players = new HashSet<>(p.getViewers().values());
+        players.add(p);
+        Server.broadcastPacket(players, packet);
     }
 
     public void removeCapeSkin(Player p){
         Skin modelSkin = new Skin();
+        modelSkin.setSkinId(MainClass.defaultSkin.getSkinId());
         modelSkin.setSkinData(p.getSkin().getSkinData());
         modelSkin.setGeometryData(p.getSkin().getGeometryData());
         modelSkin.setGeometryDataEngineVersion(p.getSkin().getGeometryDataEngineVersion());
@@ -168,5 +182,13 @@ public class capeItem implements purchaseItem {
         modelSkin.setCapeOnClassic(false);
         modelSkin.setTrusted(true);
         p.setSkin(modelSkin);
+        PlayerSkinPacket packet = new PlayerSkinPacket();
+        packet.skin = modelSkin;
+        packet.newSkinName = modelSkin.getSkinId();
+        packet.oldSkinName = p.getSkin().getSkinId();
+        packet.uuid = p.getUniqueId();
+        HashSet<Player> players = new HashSet<>(p.getViewers().values());
+        players.add(p);
+        Server.broadcastPacket(players, packet);
     }
 }

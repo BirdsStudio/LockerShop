@@ -29,7 +29,7 @@ public class FormListener implements Listener {
 
     public static HashMap<Player, String> selectedCategory = new HashMap<>();
 
-    @EventHandler()
+    @EventHandler
     public void PlayerFormRespondedEvent(PlayerFormRespondedEvent event) {
         Player p = event.getPlayer();
         FormWindow window = event.getWindow();
@@ -189,7 +189,7 @@ public class FormListener implements Listener {
                         p.sendMessage("§c§l[提示] 请不要过快刷新皮肤，每次刷新有5秒冷却时间！");
                         return;
                     }
-                    playerEquipItemHashMap.get(p).unequip(p);
+                    playerEquipItemHashMap.get(p).remove(p);
                 }else{
                     if(playerEquipItemHashMap.get(p) instanceof capeItem){
                         FormCreator.showMyCapesMenu(p);
