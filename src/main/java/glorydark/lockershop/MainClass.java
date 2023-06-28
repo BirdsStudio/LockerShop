@@ -19,6 +19,7 @@ import cn.nukkit.utils.SerializedImage;
 import com.sun.istack.internal.NotNull;
 import glorydark.lockershop.forms.FormCreator;
 import glorydark.lockershop.forms.FormListener;
+import glorydark.lockershop.forms.FormType;
 import glorydark.lockershop.items.capeItem;
 import glorydark.lockershop.items.particleItem;
 import glorydark.lockershop.items.skinItem;
@@ -155,7 +156,31 @@ public class MainClass extends PluginBase{
                     break;
                 case "menu":
                     if(commandSender.isPlayer()){
-                        FormCreator.showMainMenu((Player) commandSender);
+                        Player player = (Player) commandSender;
+                        if(strings.length == 1){
+                            FormCreator.showMainMenu(player);
+                        }else if(strings.length == 2){
+                            switch (strings[1]){
+                                case "myskin":
+                                    FormCreator.showMySkinsMenu(player);
+                                    break;
+                                case "mycape":
+                                    FormCreator.showMyCapesMenu(player);
+                                    break;
+                                case "myparticle":
+                                    FormCreator.showMyParticlesMenu(player);
+                                    break;
+                                case "buyskin":
+                                    FormCreator.showCategorySelectMenu(player, FormType.BuySkinCategory);
+                                    break;
+                                case "buycape":
+                                    FormCreator.showCategorySelectMenu(player, FormType.BuyCapeCategory);
+                                    break;
+                                case "buyparticle":
+                                    FormCreator.showCategorySelectMenu(player, FormType.BuyParticleCategory);
+                                    break;
+                            }
+                        }
                     }
                     break;
                 case "giveskin":
