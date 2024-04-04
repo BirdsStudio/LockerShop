@@ -16,7 +16,6 @@ import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.SerializedImage;
-import com.sun.istack.internal.NotNull;
 import glorydark.lockershop.forms.FormCreator;
 import glorydark.lockershop.forms.FormListener;
 import glorydark.lockershop.forms.FormType;
@@ -602,7 +601,7 @@ public class MainClass extends PluginBase{
         return null;
     }
 
-    public static String readFile(@NotNull File file) {
+    public static String readFile(File file) {
         String content = "";
         try {
             content = cn.nukkit.utils.Utils.readFile(file);
