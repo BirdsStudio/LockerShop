@@ -96,7 +96,7 @@ public class FormListener implements Listener {
             case BuyCapeCategory:
                 List<String> categories = new ArrayList<>(MainClass.configs.getSection("cape_category").getKeys(false));
                 String category = categories.get(simple.getClickedButtonId());
-                FormCreator.showPurchasableSkinsMenu(p, category);
+                FormCreator.showPurchasableCapesMenu(p, category);
                 selectedCategory.put(p, category);
                 break;
             case BuySkinCategory:
@@ -108,7 +108,7 @@ public class FormListener implements Listener {
             case BuyParticleCategory:
                 categories = new ArrayList<>(MainClass.configs.getSection("particle_category").getKeys(false));
                 category = categories.get(simple.getClickedButtonId());
-                FormCreator.showPurchasableSkinsMenu(p, categories.get(simple.getClickedButtonId()));
+                FormCreator.showPurchasableParticlesMenu(p, categories.get(simple.getClickedButtonId()));
                 selectedCategory.put(p, category);
                 break;
             case ShopMenuCape:
